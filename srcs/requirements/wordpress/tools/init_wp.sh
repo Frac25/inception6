@@ -4,7 +4,8 @@ set -e
 
 #export WP_PASSWORD=$(cat /run/secrets/wp_password)
 #export WP_ROOT_PASSWORD=$(cat /run/secrets/wp_root_password)
-#export DB_PASSWORD=$(cat /run/secrets/db_password)
+export DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+export DB_PASSWORD=$(cat /run/secrets/db_password)
 
 # here we creat the folder which has the php socket inside which is needed to connect with fpm
 mkdir -p /run/php
