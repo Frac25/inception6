@@ -20,7 +20,7 @@ all: build up
 
 build:
 	echo "$(BLUE)building $(PROJECT)...$(RESET)"
-	docker-compose -f $(DOC_COMPOSE) build && \
+	docker-compose -f $(DOC_COMPOSE) build --no-cache && \
 	echo "$(GREEN) $(PROJECT) succesfully built!$(RESET)" || \
 	echo "$(RED) $(PROJECT) failed the building process!$(RESET)"
 
@@ -68,7 +68,7 @@ fclean:
 re: clean build up
 
 secrets: 
-#	mkdir -p ./secrets
+	mkdir -p ./secrets
 	touch secrets/db_passwd
 	touch secrets/db_root_passwd
 	touch secrets/wp_passwd
