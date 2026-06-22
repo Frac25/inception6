@@ -1,11 +1,8 @@
 #!/bin/sh
 
-#set -eo pipefail
-#set -e pipefail
-set -e #SDU
+set -e
 
-DB_PASSWORD=$(cat /run/secrets/db_password)
-DB_ROOT_PASSWORD=$(cat /run/secrets/db_root_password)
+DB_USER_PASSWORD=$(cat /run/secrets/db_user_password)
 DB_INITIALIZED="/var/lib/mysql/inited"
 
 mkdir -p /run/mysqld
@@ -27,7 +24,7 @@ if [ ! -f "$DB_INITIALIZED" ]; then
 	done
 
 	echo "CREATE DATABASE IF NOT EXISTS $DB_DATABASE ;" > db1.sql
-	echo "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD' ;" >> db1.sql
+	echo "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_USER_PASSWORD' ;" >> db1.sql
 	echo "GRANT ALL PRIVILEGES ON $DB_DATABASE.* TO '$DB_USER'@'%' ;" >> db1.sql
 	echo "FLUSH PRIVILEGES;" >>  db1.sql
 	echo "> parsing input into mysql"

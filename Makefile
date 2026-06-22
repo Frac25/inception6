@@ -12,7 +12,7 @@ SRC_DIR = srcs
 DOC_COMPOSE = $(SRC_DIR)/docker-compose.yml
 
 #modifications
-.PHONY: build up down clean
+.PHONY: all build up db wp nx down clean fclean re secrets
 .SILENT:
 
 #commands
@@ -24,7 +24,38 @@ build:
 	echo "$(GREEN) $(PROJECT) succesfully built!$(RESET)" || \
 	echo "$(RED) $(PROJECT) failed the building process!$(RESET)"
 
-# for single testing !/-._.-\!
+clean: down
+	echo "$(BLUE)removing everything...$(RESET)"
+	docker system prune -af
+	docker volume prune -f
+	docker network prune -f
+
+fclean:
+	echo "Stopping containers..."
+	docker-compose -f srcs/docker-compose.yml down -v --remove-orphans
+
+	echo "Removing bind mount directories..."
+	sudo rm -rf /home/$(USER)/data/mariadb
+	sudo rm -rf /home/$(USER)/data/wordpress
+
+	echo "Recreating clean data directories..."
+	mkdir -p /home/$(USER)/data/mariadb
+	mkdir -p /home/$(USER)/data/wordpress
+
+	echo "Removing secrets..."
+	sudo rm -rf ./secrets
+
+	echo "Full clean completed."
+
+re: clean build up
+
+secrets:
+	mkdir -p ./secrets
+	touch secrets/db_user_password
+	touch secrets/wp_user_password
+	touch secrets/wp_root_password
+
+# for single testing
 up:
 	echo "$(BLUE)starting $(PROJECT)...$(RESET)"
 	docker-compose -f $(DOC_COMPOSE) up -d
@@ -44,33 +75,3 @@ nx:
 down:
 	echo "$(BLUE)stopping $(PROJECT)...$(RESET)"
 	docker-compose -f $(DOC_COMPOSE) down
-
-clean: down
-	echo "$(BLUE)removing everything...$(RESET)"
-	docker system prune -af
-	docker volume prune -f
-	docker network prune -f
-
-fclean:
-	@echo "Stopping containers..."
-	@docker-compose -f srcs/docker-compose.yml down -v --remove-orphans
-
-	@echo "Removing bind mount directories..."
-	@sudo rm -rf /home/$(USER)/data/mariadb
-	@sudo rm -rf /home/$(USER)/data/wordpress
-
-	@echo "Recreating clean data directories..."
-	@mkdir -p /home/$(USER)/data/mariadb
-	@mkdir -p /home/$(USER)/data/wordpress
-
-			@echo "Full clean completed."
-
-re: clean build up
-
-secrets: 
-	mkdir -p ./secrets
-	touch secrets/db_passwd
-	touch secrets/db_root_passwd
-	touch secrets/wp_passwd
-	touch secrets/wp_root_passwd
-
